@@ -1,0 +1,27 @@
+{
+  "name": "@drawday/config",
+  "version": "1.0.0",
+  "type": "module",
+  "exports": {
+    "./tailwind.css": "./tailwind.css",
+    "./tsconfig": "./tsconfig.base.json",
+    "./prettier": "./prettier.config.js",
+    "./prettierignore": "./.prettierignore"
+  },
+  "files": [
+    "tailwind.css",
+    "tsconfig.base.json",
+    "prettier.config.js",
+    ".prettierignore"
+  ],
+  "devDependencies": {
+    "@types/bun": "latest",
+    "tailwindcss": "^4",
+    "prettier": "^3.2.0"
+  },
+  "peerDependencies": {
+    "typescript": "^5",
+    "tailwindcss": "^4",
+    "prettier": "^3.2.0"
+  }
+}

@@ -1,0 +1,118 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+model Image {
+  id        Int      @id @default(autoincrement())
+  url       String
+  path      String
+  width     Int
+  height    Int
+  altText   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  companyLogos       Company?     @relation("CompanyLogo")
+  companyBanners     Company?     @relation("CompanyBanner")
+  competitionBanners Competition? @relation("CompetitionBanner")
+}
+
+model Competition {
+  id        Int      @id @default(autoincrement())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  companyId Int
+  filePath  String
+
+  // One-way optional banner reference to Image
+  competitionBanner   Image? @relation(name: "CompetitionBanner", fields: [competitionBannerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  competitionBannerId Int?   @unique
+}
+
+model Company {
+  id           Int           @id @default(autoincrement())
+  name         String
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  users        User[]        @relation("UserCompanies")
+  competitions Competition[]
+
+  // One-way optional logo and banner references to Image
+  logoImage   Image? @relation(name: "CompanyLogo", fields: [logoImageId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  logoImageId Int?   @unique
+
+  bannerImage   Image? @relation(name: "CompanyBanner", fields: [bannerImageId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  bannerImageId Int?   @unique
+}
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id
+  name          String
+  email         String
+  emailVerified Boolean   @default(false)
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @default(now()) @updatedAt
+  sessions      Session[]
+  accounts      Account[]
+  companies     Company[] @relation("UserCompanies")
+
+  @@unique([email])
+  @@map("user")
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([token])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @default(now()) @updatedAt
+
+  @@map("verification")
+}

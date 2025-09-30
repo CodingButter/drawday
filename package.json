@@ -1,0 +1,11 @@
+{
+  "name": "drawday",
+  "version": "1.0.0",
+  "scripts":{
+    "dev":"bun --filter './apps/*' dev"
+  },
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ]
+}
